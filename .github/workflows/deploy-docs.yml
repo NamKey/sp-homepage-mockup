@@ -2,7 +2,7 @@ name: Deploy Docs to GitHub Pages
 
 on:
   push:
-    branches: [ develop ]  # 특정 브랜치
+    branches: [ docs ]  # 특정 브랜치
 
 permissions:
   contents: read
