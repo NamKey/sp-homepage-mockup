@@ -1,17 +1,16 @@
-name: Deploy Docs to GitHub Pages
+name: Deploy Next.js to GitHub Pages
 
 on:
   push:
-    branches: [ docs ]  # 특정 브랜치
+    branches: [ docs ]  # 배포 브랜치에 맞춰 조정
+  workflow_dispatch:
 
 permissions:
   contents: read
   pages: write
   id-token: write
 
-concurrency:
-  group: "pages"
-  cancel-in-progress: true
+concurrency: { group: "pages", cancel-in-progress: true }
 
 jobs:
   build:
@@ -19,28 +18,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
 
-      - name: Install dependencies
-        run: npm ci
+      - run: npm ci
+      - run: npm run build   # out/ 생성 (output: 'export')
 
-      - name: Build
-        run: npm run build   # Next.js static export: ./out 폴더에 생성
+      - name: Add .nojekyll for GitHub Pages
+        run: bash -lc "touch out/.nojekyll"
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
         with:
-          path: out
+          path: ./out
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+    environment: { name: github-pages }
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
