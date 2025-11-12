@@ -2,7 +2,7 @@ name: Deploy Docs to GitHub Pages
 
 on:
   push:
-    branches: [ docs ]  # 특정 브랜치
+    branches: [ develop ]  # 특정 브랜치
 
 permissions:
   contents: read
@@ -28,12 +28,12 @@ jobs:
         run: npm ci
 
       - name: Build
-        run: npm run build   # 결과물: ./dist 라고 가정
+        run: npm run build   # Next.js static export: ./out 폴더에 생성
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: out
 
   deploy:
     needs: build
